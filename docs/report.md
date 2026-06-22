@@ -1,6 +1,4 @@
-# 数据结构与算法课程大作业
-
-## 自动扫雷器 —— Minesweeper Auto Solver
+# 自动扫雷器 —— Minesweeper Auto Solver
 
 **GitHub 仓库**：https://github.com/linearity0/MineSweeperSolver
 
