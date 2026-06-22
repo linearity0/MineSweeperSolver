@@ -59,7 +59,7 @@ class MinesweeperGUI:
         self.auto_delay = 150
         self.auto_timer = 0
         self.ai_message = ""
-        self.timer_start = pygame.time.get_ticks()
+        self.timer_start = 0
         self.timer_frozen = 0
 
     @staticmethod
@@ -147,8 +147,10 @@ class MinesweeperGUI:
             self.btn_rects[name] = rect
             x += w + gap
 
-        # 右侧：耗时（游戏结束时冻结）
-        if self.game.game_over:
+        # 右侧：耗时（未开始显示000，结束时冻结）
+        if self.timer_start == 0:
+            elapsed = 0
+        elif self.game.game_over:
             if self.timer_frozen == 0:
                 self.timer_frozen = (pygame.time.get_ticks() - self.timer_start) // 1000
             elapsed = self.timer_frozen
@@ -213,6 +215,7 @@ class MinesweeperGUI:
                     pygame.draw.polygon(self.screen, (220, 40, 40), pts)
                     pygame.draw.polygon(self.screen, (180, 20, 20), pts, 1)
 
+
     # ==================== 事件 ====================
 
     def handle_click(self, mx: int, my: int):
@@ -223,7 +226,11 @@ class MinesweeperGUI:
 
         pos = self._cell_at_pos(mx, my)
         if pos and not self.game.game_over:
+            if self.timer_start == 0:
+                self.timer_start = pygame.time.get_ticks()
             self.game.reveal(*pos)
+            if self.game.game_over:
+                self.ai_message = "You Win!" if self.game.win else "Game Over!"
 
     def handle_right_click(self, mx: int, my: int):
         pos = self._cell_at_pos(mx, my)
@@ -240,7 +247,7 @@ class MinesweeperGUI:
             self._init_game()
             self.auto_running = False
             self.ai_message = ""
-            self.timer_start = pygame.time.get_ticks()
+            self.timer_start = 0
             self.timer_frozen = 0
         elif name == "step":
             if not self.game.game_over:
@@ -278,7 +285,7 @@ class MinesweeperGUI:
                         self._init_game()
                         self.auto_running = False
                         self.ai_message = ""
-                        self.timer_start = pygame.time.get_ticks()
+                        self.timer_start = 0
                         self.timer_frozen = 0
                     elif event.key in (pygame.K_1, pygame.K_2, pygame.K_3):
                         diffs = ["初级", "中级", "高级"]
@@ -293,7 +300,7 @@ class MinesweeperGUI:
                     self.ai_message = ai_step(self.game)
                     if self.game.game_over:
                         self.auto_running = False
-                        self.ai_message = "Win!" if self.game.win else "踩雷!"
+                        self.ai_message = "You Win!" if self.game.win else "Game Over!"
 
             self.screen.fill(WINDOW_BG)
             self._draw_grid()
